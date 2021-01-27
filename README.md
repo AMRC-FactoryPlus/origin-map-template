@@ -24,7 +24,7 @@ The following defines how each field (column in the CSV file) should be filled o
 	- For **REST**: Use `GET`, `PUT`, `POST`, `DELETE` methods as required. Multiple methods for a single tag can be indicated using comma separated combinations.
 	- Use REST style syntax for other protocols too: `GET` for read-only outputs and static values and `PUT` for inputs or write operations.
 - **Data type**: String
-- **Examples**: `GET`,`PUT`, `GET,POST`
+- **Examples**: `GET`, `PUT`, `GET,POST`
 - **Optional**: No
 
 
@@ -106,23 +106,26 @@ The following defines how each field (column in the CSV file) should be filled o
 ### DeviceType
 - **Description**: The `DeviceType`, `DeviceName` and `CDSName` columns together form the entire Common Data Structure (CDS) path to where a specific tag will be stored on the Factory+ network. This `DeviceType` column is the top-level folder in the CDS and indicates the category or type of device. There are a limited number of device types provided with the existing CDSs and each `DeviceType` dictates the folder structure (the contents of the `DeviceName` and `CDSName` columns) for the tags to be stored.
 
-  For any tags that do not belong under an existing `DeviceType`, the user can create a custom structure using the `User_Defined` device type. The naming convention for all folders and variable within `User_Defined` should be `Pascal_Snake_Case` if possible or be inherited from the device/protocol in use.
+  Within each DeviceType, a top-level folder in the `CDSName` column called `User_Defined` is available. It allows the user to create a custom folder structure for any variables that they want to be captured but not currently included in the rest of the CDS. The variable/folder names within `User_Defined` must use the `Pascal_Snake_Case` naming convention with capital letters for all first letters of words with underscore delimiters for more than one word. Additionally, all folder structures must be clear and concise and be delimited with a `/` character.
+
 - **Data type**: String
-- **Examples**: `MotionDevices`, `CncAxisList`, `Smart Tools`, `User_Defined`
+- **Examples**: `RoboticSystem`, `CncSystem`, `Smart_Tools`
 - **Optional**: No
 
 ### DeviceName
 - **Description**: The `DeviceType`, `DeviceName` and `CDSName` columns together form the entire CDS path to where a specific tag will be stored on the Factory+ network. While the `DeviceType` column provides the top-level category in the CDS, this `DeviceName` column is the second level in the CDS (child folder of `DeviceType`) and provides a specific name to the device. This can be a user created name for the device to distinguish between other devices stored under the same `DeviceType` or if possible, extracted as a tag (such as the robot name) from the device itself.
-
-  Note that when using custom `User_Defined` variables, some kind of `DeviceName` should always be provided to give context as to which device the tag relates to. This can be a `DeviceName` that has already been used in the Origin Map (if the tag is related to other tags in the Origin Map, but there is no default CDS path provided for this type of tag) or can be an arbitrary new name for tags that don't fit under any existing `DeviceName`. Any new folder structures, should be created with clear, concise and logical groups and hierarchies of tags so that if required and following consultations with the Factory+ working group, could lead to the creation of new CDSs or new sections in existing CDSs.
 - **Data type**: String
-- **Examples**: `Robot1`, `Y Axis`, `Bosch Nexo Nutrunner 1`
+- **Examples**: `Mazak1`, `MiR_Fleet_1`, `Bosch_Nexo_Nutrunner_1`
 - **Optional**: No
 
 ### CDSName
-- **Description**: The `DeviceType`, `DeviceName` and `CDSName` columns together form the entire CDS path to where a specific tag will be stored on the Factory+ network. While the `DeviceType` column provides the top-level category in the CDS, and the `DeviceName` column provides the second level name of the device in the CDS (child folder of `DeviceType`), this `CDSName` column provides the rest of the folder structure to reach the tag. Each level of folder should be delimited by a slash `/`. Additionally, some tags (within angle brackets `<`, `>`) are placeholders and should be replaced with appropriate names/identifiers. They usually occur one level after a category/array folder and are used to identify elements within the category. Example `CDSName` include `Axes/<Axis Name>/ActualPosition` (from Robot CDS) or `Mission_List/<Mission_Name>` (from AGV CDS) and the contents in the angle brackets would be replaced by an actual identifier for the axis or an actual name of the mission. The name/identifier can be manually entered as an arbitrary string by the user (such as `Joint1` for the axis) or be extracted as tag data from the device itself (for the JSON messages of the MiR AGVs, can provide data using [JSONPath](https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html) notation within the angle brakets, as well as providing the appropriate `TagAddress` and `TagPath` columns in the Origin Map to extract the name of the AGV mission).
+- **Description**: The `DeviceType`, `DeviceName` and `CDSName` columns together form the entire CDS path to where a specific tag will be stored on the Factory+ network. While the `DeviceType` column provides the top-level category in the CDS, and the `DeviceName` column provides the second level name of the device in the CDS (child folder of `DeviceType`), this `CDSName` column provides the rest of the folder structure to reach the tag. Each level of folder should be delimited by a slash `/`. Additionally, some tags (within angle brackets `<`, `>`) are placeholders and should be replaced with appropriate names/identifiers. They usually occur one level after a category/array folder and are used to identify elements within the category. Example `CDSName` include `MotionDevices/<MotionDeviceName>/Axes/<Axis Name>/ActualPosition` (from Robot CDS) or `Mission_List/<Mission_Name>` (from AGV CDS) and the contents in the angle brackets would be replaced by an actual identifier for the axis or an actual name of the mission.
+
+	The name/identifier can be manually entered as an arbitrary string by the user (such as `Joint1` for the axis) or be extracted as tag data from the device itself. For the JSON messages of the MiR AGVs, the user can provide data using [JSONPath](https://support.smartbear.com/alertsite/docs/monitors/api/endpoint/jsonpath.html) notation within the angle brakets, as well as providing the appropriate `TagAddress` and `TagPath` columns in the Origin Map to extract the name of the AGV mission.
+
+	Note that a top-level folder in the `CDSName` column called `User_Defined` is available for all devices allowing for custom folder structures. If the `User_Defined` variable is related to other folders/variables in the CDS, the name of the child folder should use the same name as used in the related folders. For example in a CNC system, there may be a variable located at `CncAxisList/B_Axis/ActLoad` and if the user wanted to add a custom variable called `Rotary_Mode` related to the `B_Axis`, this should be located at `User_Defined/B_Axis/Rotary_Mode`. The variable/folder names within `User_Defined` must use the `Pascal_Snake_Case` naming convention with capital letters for all first letters of words with underscore delimiters for more than one word. Any new folder structures, should be created with clear, concise and logical groups and hierarchies of tags so that if required and following consultations with the Factory+ working group, could lead to the creation of new CDSs or new sections in existing CDSs.
 - **Data type**: String with forward slash (`/`) category separation.
-- **Examples**: `Axes/Joint1/ActualPosition`, `AnglePos/ActPos`, `Robot_List/5/Current_Position/Pos_X`, or using JSONPath notation to extract all the mission names `Mission_List/<$..name>`
+- **Examples**: `MotionDevices/Robot1/Axes/Joint1/ActualPosition`, `CncSpindleList/SpindleA/AnglePos/ActPos`, `Robot_List/5/Status/Current_Position/Pos_X`, or using JSONPath notation to extract all the mission names `Mission_List/<$..name>`
 - **Optional**: No
 
 
